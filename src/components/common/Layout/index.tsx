@@ -1,5 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { Navbar } from "./Navbar";
+import { Footer } from "./Footer";
 
 interface layoutProps {
   children: JSX.Element;
@@ -7,9 +8,10 @@ interface layoutProps {
 
 const Layout = ({ children }: layoutProps) => {
   return (
-    <Box>
+    <Box fontFamily="'Arimo', sans-serif" fontWeight="bold" maxHeight="100vh" overflow="hidden">
       <Navbar />
       {children}
+      <Footer/>
     </Box>
   );
 };

@@ -1,10 +1,15 @@
 import { extendTheme } from "@chakra-ui/react";
 
 export const colors = {
-  fb: "#0386FF",
-  cloud: "#EEEEEE",
-  clouder: "#DDDDDD",
-  block: "#F4F4F4"
+  blue : {
+    100: "#B4E1FF",
+  },
+  block : "#B4E1FF",
+  iconActive : "#736CED",
+  btnHover: "#E5E5E5",
+  btnColor: {
+    1: "#736CED",
+  }
 };
 
 const theme = extendTheme({ colors });

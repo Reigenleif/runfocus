@@ -1,4 +1,6 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
+import { SettingSlice, useSettingActions } from "../util/redux/settingSlice";
+import {useSelector} from "react-redux"
 
 export const WelcomePage = () => {
   return (
