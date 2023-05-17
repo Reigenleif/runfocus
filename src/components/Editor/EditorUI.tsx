@@ -7,6 +7,9 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RunningStepTab } from "./RunningStepTab";
+import { BtnEdit } from "./EditorButtons";
+import { MdAddCircleOutline, MdCached, MdDelete } from "react-icons/md";
+import { colors } from "../../theme";
 
 
 interface EditorState {
@@ -23,7 +26,8 @@ const BLANK_EDITOR_STATE: EditorState = {
 
 
 export const EditorUI = () => {
-  const [state, setState] = useState<EditorState>();
+  const [seq, setSeq] = useState<RunningSequenceType>();
+  const [isReordering, setIsReordering] = useState(false);
   const { setting } = useSelector((state: any) => state);
   useEffect(() => {
     if (setting.runningSequenceID) {
@@ -40,41 +44,7 @@ export const EditorUI = () => {
     return <div />;
   }
 
-  const addStep = (step: RunningStepType) => {
-    setState((s) => {
-      s?.seq.steps.push(step)
-      return s;
-    })
-  }
-
-  const insertStep = (at: number) => (step: RunningStepType) => {
-    setState((st) => {
-      if (!st) {
-        return st
-      }
-      let s: RunningStepType[] = [...st.seq.steps]
-      console.log(s)
-      s.splice(at,0,step);
-      const newSt: EditorState = {...st,seq : { 
-        ...st.seq,
-        steps: s
-      }}
-      return newSt
-    })
-  }
-
-  const deleteStep = (at: number) => {
-    setState((s) => {
-      if(!s) {
-        return
-      }
-      const newSteps= s.seq.steps.filter((v,i) => i != at);
-      if (newSteps) {
-        s.seq.steps = newSteps
-      }
-      return s 
-    })
-  }
+  
 
   return (
     <Flex  mt="1em" alignItems="center" w="100%" flexDir="column">
@@ -90,13 +60,16 @@ export const EditorUI = () => {
               deleteStep={deleteStep}
               key={i}
               index={i}
+              isReordering={isReordering}
             />
           );
         })}
         
       </Box>
-      <Flex w="min(30em,90%)" justifyContent="space-between">
-
+      <Flex w="min(30em,90%)" justifyContent="space-between" my="1em">
+        <BtnEdit Mdi={MdCached} color="black" onClick={toggleReordering}/>
+        <BtnEdit Mdi={MdAddCircleOutline} color={colors.btnColor[1]} onClick={() => {}}/>
+        <BtnEdit Mdi={MdDelete} color="salmon" onClick={() => {}}/>
       </Flex>
     </Flex>
   );

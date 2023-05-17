@@ -35,12 +35,14 @@ export const RunningStepTab = ({
   insertStep,
   deleteStep,
   index,
+  isReordering
 }: {
   runningStepInfo: RunningSequenceStepInfo;
   runningStep: RunningStepType;
   insertStep: (step: RunningStepType) => void;
   deleteStep: (at: number) => void;
   index: number;
+  isReordering: boolean;
 }) => {
   const [{ isDragging }, drag] = useDrag({
     type: "seq",
@@ -72,7 +74,7 @@ export const RunningStepTab = ({
       >
         <Image src={runningStepInfo.img} w="2em" h="2em" />
         <Text>{`${runningStep.duration} ${runningStepInfo.name} x${runningStep.reps}`}</Text>
-        <MdReorder size="2em" />
+        {isReordering ?  : <MdReorder size="2em" /> }
       </Flex>
     </>
   );
