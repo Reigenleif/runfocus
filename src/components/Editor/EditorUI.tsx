@@ -10,11 +10,10 @@ import { RunningStepTab } from "./RunningStepTab";
 import { BtnEdit } from "./EditorButtons";
 import { MdAddCircleOutline, MdCached, MdDelete } from "react-icons/md";
 import { colors } from "../../theme";
+import { EditorUtil } from "./EditorUtil";
 
 
-interface EditorState {
-  seq: RunningSequence;
-}
+
 
 const BLANK_EDITOR_STATE: EditorState = {
   seq: {
@@ -26,21 +25,10 @@ const BLANK_EDITOR_STATE: EditorState = {
 
 
 export const EditorUI = () => {
-  const [seq, setSeq] = useState<RunningSequenceType>();
-  const [isReordering, setIsReordering] = useState(false);
+  const { seqState, EditorFn } = EditorUtil({});
   const { setting } = useSelector((state: any) => state);
-  useEffect(() => {
-    if (setting.runningSequenceID) {
-      setState({
-        seq: setting.runningSequenceList.find(
-          (sequ: RunningSequence) => sequ.id === setting.runningSequenceID
-        ),
-      });
-    } else {
-      setState({ seq: setting.runningSequenceList[0] });
-    }
-  }, [setting]);
-  if (!state) {
+  
+  if (!seqState) {
     return <div />;
   }
 
@@ -49,7 +37,7 @@ export const EditorUI = () => {
   return (
     <Flex  mt="1em" alignItems="center" w="100%" flexDir="column">
       <Box w="min(30em,90%)" borderRadius="5px" bg="white" h="65vh" overflowY="scroll">
-        {state.seq.steps.map((step, i) => {
+        {seqState.map((step: , i) => {
           return (
             <RunningStepTab
               runningStep={step}
