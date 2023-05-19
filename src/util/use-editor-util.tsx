@@ -3,15 +3,15 @@ import {
   RunningSequence,
   RunningStepType,
   useSettingActions,
-} from "../../util/redux/settingSlice";
+} from "./redux/settingSlice";
 import { useSelector } from "react-redux";
-import { SettingState } from "../../util/redux/settingSlice";
+import { SettingState } from "./redux/settingSlice";
 
 export const UseEditorUtil = ({}) => {
   const [seqState, setSeqState] = useState<RunningStepType[]>();
   const [isReordering, setIsReordering] = useState(false);
 
-  const setting = useSelector((s: SettingState) => s);
+  const { setting } = useSelector((s: { setting: SettingState }) => s);
 
   useEffect(() => {
     if (setting.runningSequenceID) {
@@ -30,8 +30,12 @@ export const UseEditorUtil = ({}) => {
   }, [setting]);
 
   const addStep = (step: RunningStepType) => {
-    setSeqState((s) => {
-      s?.push(step);
+    setSeqState((st) => {
+      if (!st) {
+        return st;
+      }
+      let s: RunningStepType[] = [...st];
+      s.push(step);
       return s;
     });
   };
@@ -42,10 +46,8 @@ export const UseEditorUtil = ({}) => {
         return st;
       }
       let s: RunningStepType[] = [...st];
-      console.log(s);
       s.splice(at, 0, step);
-      const newSt: RunningStepType[] = [...st];
-      return newSt;
+      return s;
     });
   };
 
@@ -54,7 +56,29 @@ export const UseEditorUtil = ({}) => {
       if (!s) {
         return;
       }
+      console.log(at);
       const newSteps = s.filter((v, i) => i != at);
+      return newSteps;
+    });
+  };
+
+  const swapStep = (i: number, j: number) => {
+    if (seqState && j == seqState.length) {
+      addStep(seqState[i]);
+      deleteStep(i);
+    } else if (seqState && i == seqState.length) {
+      addStep(seqState[j]);
+      deleteStep(j);
+    }
+
+    setSeqState((s) => {
+      if (!s) {
+        return;
+      }
+      const newSteps = [...s];
+      const temp = newSteps[i];
+      newSteps[i] = newSteps[j];
+      newSteps[j] = temp;
       return newSteps;
     });
   };
@@ -71,5 +95,8 @@ export const UseEditorUtil = ({}) => {
     insertStep,
     deleteStep,
     toggleReordering,
+    swapStep,
   };
 };
+
+export type EditorUtilType = ReturnType<typeof UseEditorUtil>;

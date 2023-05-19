@@ -1,23 +1,28 @@
-import { Box, Flex, Image, Text } from "@chakra-ui/react";
-import { MdReorder } from "react-icons/md";
+import { Box, Button, Flex, Image, Text } from "@chakra-ui/react";
+import {
+  MdKeyboardArrowDown,
+  MdKeyboardArrowUp,
+  MdReorder,
+} from "react-icons/md";
 import {
   RunningSequenceStepInfo,
   RunningStepType,
 } from "../../util/redux/settingSlice";
 import { useDrag, useDrop } from "react-dnd";
+import { EditorUtilType } from "../../util/use-editor-util";
 
 export const RunningStepTabDrop = ({
-  insertStep,
-  deleteStep,
+  swapStep,
+  index,
 }: {
-  insertStep: (step: RunningStepType) => void;
-  deleteStep: (at: number) => void;
+  swapStep: (i:number, j:number) => void;
+  index: number;
 }) => {
   const [{ isOver }, drop] = useDrop({
     accept: "seq",
     drop: (item: { step: RunningStepType; index: number }) => {
-      insertStep(item.step);
-      deleteStep(item.index + 1);
+        swapStep(item.index, index);
+        console.log(item.index, index)
     },
     collect: (monitor) => {
       return {
@@ -29,20 +34,59 @@ export const RunningStepTabDrop = ({
   return <Box w="100%" h={isOver ? "4em" : "1.5em"} ref={drop} />;
 };
 
+const ReorderButtons = ({
+  editorUtil,
+  index,
+}: {
+  editorUtil: EditorUtilType;
+  index: number;
+}) => {
+  const { deleteStep, insertStep } = editorUtil;
+
+  if (!editorUtil.seqState) {
+    return <div />;
+  }
+  const currentStepInfo = editorUtil.seqState[index];
+  const numberOfSteps = editorUtil.seqState.length || 0;
+  const shiftBackward =
+    index > 0
+      ? () => {
+          deleteStep(index);
+          insertStep(index - 1)(currentStepInfo);
+        }
+      : () => {};
+  const shiftForward =
+    index < numberOfSteps - 1
+      ? () => {
+          deleteStep(index);
+          insertStep(index + 1)(currentStepInfo);
+        }
+      : () => {};
+
+  return (
+    <Flex flexDir="column" w="2em" alignItems="center">
+      <Box onClick={shiftBackward} cursor="pointer">
+        {" "}
+        <MdKeyboardArrowUp size="1.5em" color="black" />
+      </Box>
+      <Box onClick={shiftForward} cursor="pointer">
+        {" "}
+        <MdKeyboardArrowDown size="1.5em" color="black" />
+      </Box>
+    </Flex>
+  );
+};
+
 export const RunningStepTab = ({
   runningStepInfo,
   runningStep,
-  insertStep,
-  deleteStep,
   index,
-  isReordering
+  editorUtil,
 }: {
   runningStepInfo: RunningSequenceStepInfo;
   runningStep: RunningStepType;
-  insertStep: (step: RunningStepType) => void;
-  deleteStep: (at: number) => void;
   index: number;
-  isReordering: boolean;
+  editorUtil: EditorUtilType;
 }) => {
   const [{ isDragging }, drag] = useDrag({
     type: "seq",
@@ -57,9 +101,14 @@ export const RunningStepTab = ({
     },
   });
 
+  const { isReordering, swapStep } = editorUtil;
+
   return (
     <>
-      <RunningStepTabDrop insertStep={insertStep} deleteStep={deleteStep} />
+      <RunningStepTabDrop
+        swapStep = {swapStep}
+        index={index}
+      />
       <Flex
         justifyContent="space-between"
         alignItems="center"
@@ -74,7 +123,11 @@ export const RunningStepTab = ({
       >
         <Image src={runningStepInfo.img} w="2em" h="2em" />
         <Text>{`${runningStep.duration} ${runningStepInfo.name} x${runningStep.reps}`}</Text>
-        {isReordering ?  : <MdReorder size="2em" /> }
+        {isReordering ? (
+          <ReorderButtons editorUtil={editorUtil} index={index} />
+        ) : (
+          <MdReorder size="2em" />
+        )}
       </Flex>
     </>
   );

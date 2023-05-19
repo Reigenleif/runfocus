@@ -25,7 +25,3 @@ export const BtnEdit = ({ onClick, Mdi, color }: BtnEditProps) => {
     </Flex>
   );
 };
-
-interface ReorderButtons {
-    EditorKit: 
-}
