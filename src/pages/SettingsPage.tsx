@@ -1,7 +1,7 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { Slide } from "../util/entrance-animation";
 import { useSelector } from "react-redux";
-import { useSettingActions } from "../util/redux/settingSlice";
+import { SettingState, useSettingActions } from "../util/redux/settingSlice";
 import { useNavigate } from "react-router-dom";
 
 const SettingItem = ({
@@ -41,7 +41,7 @@ const SettingItem = ({
 */
 
 export const SettingsPage = () => {
-  const settings = useSelector((state: any) => state);
+  const {setting: settings} = useSelector((state: any) => state);
   const settingActions = useSettingActions()
   const nav = useNavigate()
 
