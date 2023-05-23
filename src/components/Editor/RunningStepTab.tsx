@@ -20,7 +20,7 @@ export const RunningStepTabDrop = ({
 }) => {
   const [{ isOver }, drop] = useDrop({
     accept: "seq",
-    drop: (item: { step: RunningStepType; index: number }) => {
+    drop: (item: { step: RunningStepType; index: number}) => {
         swapStep(item.index, index);
         console.log(item.index, index)
     },

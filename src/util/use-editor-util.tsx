@@ -71,6 +71,12 @@ export const UseEditorUtil = ({}) => {
       deleteStep(j);
     }
 
+    // i don't know why this fixes the bug
+    if (i < j) {
+      j -= 1;
+    }
+    
+
     setSeqState((s) => {
       if (!s) {
         return;
