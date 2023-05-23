@@ -9,6 +9,10 @@ export const colors = {
   btnHover: "#E5E5E5",
   btnColor: {
     1: "#736CED",
+  },
+  circleProgress: {
+    inner: "#736CED",
+    outer: "#4ADE00",
   }
 };
 
