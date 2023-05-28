@@ -13,6 +13,10 @@ export const colors = {
   circleProgress: {
     inner: "#736CED",
     outer: "#4ADE00",
+  },
+  text: {
+    salmon:"#D40404",
+    violet: "#736CED",
   }
 };
 

@@ -118,7 +118,7 @@ export const useProgressionUtil = () => {
             recountTotalTimer();
             nextStep();
         }
-
+    }, [currentTimerLeft, totalTimerLeft, currentStep, currentTimer, recountTotalTimer, nextStep])
 
         
 
