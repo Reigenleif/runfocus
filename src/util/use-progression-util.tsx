@@ -2,132 +2,68 @@ import { useSelector } from "react-redux";
 import { rootStateType } from "./redux/store";
 import {useState, useEffect, useCallback} from "react"
 import { RunningStepType } from "./redux/settingSlice";
+import { useProgressionReducer } from "./use-progression-reducer";
+
+const TICK_PERIOD = 100;
 
 export const useProgressionUtil = () => {
     const {setting} = useSelector((state: rootStateType) => state);
     const {runningStepInfo} = setting;
 
-    const [currentStep, setCurrentStep] = useState<RunningStepType>();
-    const [currentIndex, setCurrentIndex] = useState<number>(0);
-    const [steps, setSteps] = useState<RunningStepType[]>([]);
-    const [currentTimer, setCurrentTimer] = useState(0);
-    const [currentTimerLeft, setCurrentTimerLeft] = useState(0);
-    const [totalTimer, setTotalTimer] = useState(0);
-    const [totalTimerLeft, setTotalTimerLeft] = useState(0);
-    
+    const {state, initializeSteps,initializeTimer,resetSteps,nextStep,togglePause,toggleStart,tick,dispatch} = useProgressionReducer()
+    const {steps,currentStep, timerLeft, totalTimerLeft, timer, totalTimer, isStarted, isPaused} = state;
 
     useEffect(() => {
-
-        if (setting.runningSequenceID) {
-            setSteps(setting.runningSequenceList.find(v => v.id === setting.runningSequenceID)?.steps ?? [])
-        } else {
-            setSteps(setting.runningSequenceList[0].steps)
-        }
-
-        let cntTime = 0;
-        for (let i = 0; i < steps.length; i++) {
-            cntTime += steps[i].duration * steps[i].reps;
-        }
-        setTotalTimer(cntTime);
-        setTotalTimerLeft(cntTime);
-
-        setCurrentStep(steps[0]);
-        setCurrentTimer(steps[0].duration);
-    }, [setting])
-
-
-    const resetSteps = useCallback(() => {
-        setSteps(setting.runningSequenceList[0].steps);
-        setCurrentStep(setting.runningSequenceList[0].steps[0]);
-        setCurrentTimer(setting.runningSequenceList[0].steps[0].duration);
-    },[setting])
-
-    const nextStep = useCallback(() => {
-        if (!currentStep) {
-            return;
-        }
-
-        if (currentStep.reps > 0) {
-            setCurrentStep({
-                ...currentStep,
-                reps: currentStep.reps - 1
-            })
-            setCurrentTimer(currentStep.duration);
-            return;
-        }
-
-        if (currentIndex + 1 >= steps.length) {
-            return;
-        }
-
-        setCurrentIndex(currentIndex + 1);
-        setCurrentStep(steps[currentIndex + 1]);
-        setCurrentTimer(steps[currentIndex + 1].duration);
-        setCurrentIndex(currentIndex + 1)
-    }, [currentStep, currentIndex, steps])
-
-    const prevStep = useCallback(() => {
-        if (currentIndex - 1 < 0) {
-            return;
-        }
-
-        setCurrentIndex(currentIndex - 1);
-        setCurrentStep(steps[currentIndex - 1]);
-        setCurrentTimer(steps[currentIndex - 1].duration);
-    }, [currentIndex, steps])
-
-    const skipStep = useCallback(() => {
-        if (!currentStep) {
-            return;
-        }
-
-        if (currentIndex + 1 >= steps.length) {
-            return;
-        }
-
-        setCurrentIndex(currentIndex + 1);
-        setCurrentStep(steps[currentIndex + 1]);
-        setCurrentTimer(steps[currentIndex + 1].duration);
-        setCurrentIndex(currentIndex + 1)
-    }, [currentStep, currentIndex, steps])
-
-    const recountTotalTimer = useCallback(() => {
-        let cntTime = 0;
-        for (let i = currentIndex; i < steps.length; i++) {
-            cntTime += steps[i].duration * steps[i].reps;
-        }
-        setTotalTimerLeft(cntTime);
-    }, [currentIndex, steps])
-
+        initializeSteps()
+        // if (!steps[0]) {
+        //     setTimeout(() => {
+        //         initializeSteps()
+        //     }, 1000)
+        //     return;
+        // }
+        initializeTimer()
+        setTimeout(()=> {
+            dispatch({type: "TICK"})
+        },1000)
+    }, [steps])
+    console.log(isStarted)
     // useEffect for timer
     useEffect(() => {
+        console.log(timerLeft, totalTimerLeft, currentStep)
+        if (!isStarted || isPaused) {
+            return;
+        }
+        
         if (!currentStep) {
             return;
         }
 
-        if (currentTimerLeft > 0) {
-            const timer = setTimeout(() => {
-                setCurrentTimerLeft(currentTimerLeft - 1);
-                setTotalTimerLeft(totalTimerLeft - 1);
-            }, 1000);
-            return;
+        if (timerLeft > 0) {
+            setTimeout(() => {
+                tick(TICK_PERIOD)
+            }, TICK_PERIOD);
+        return;
         }
 
         if (totalTimerLeft > 0) {
-            setCurrentTimerLeft(currentTimer);
-            recountTotalTimer();
             nextStep();
         }
-    }, [currentTimerLeft, totalTimerLeft, currentStep, currentTimer, recountTotalTimer, nextStep])
 
         
+    }, [state, isStarted, isPaused, timerLeft, totalTimerLeft, currentStep])
 
-    const currentTotalTimerAngle = (totalTimerLeft / totalTimer) * 360;
-    const currentTimerAngle = (currentTimerLeft / currentTimer) * 360;
+    const currentTotalTimerPercent = (totalTimerLeft / totalTimer) * 100;
+    const currentTimerPercent = (timerLeft / timer) * 100;
 
     return {
         currentStep,
-        currentTotalTimerAngle,
-        currentTimerAngle,
+        currentTimerLeft: timerLeft.toFixed(0),
+        currentTotalTimerPercent,
+        totalTimerLeft: totalTimerLeft.toFixed(0),
+        currentTimerPercent,
+        isStarted,
+        isPaused,
+        toggleStart,
+        togglePause,
     }
 }

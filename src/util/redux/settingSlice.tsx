@@ -69,7 +69,7 @@ const DUMMY_SEQUENCE_INFO: RunningSequenceStepInfo[] = [
       steps: [
         {
           id: 2,
-          duration: 60,
+          duration: 10,
           reps: 3,
         },
         {
