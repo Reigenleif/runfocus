@@ -65,7 +65,7 @@ export const Progression = () => {
           color="text.salmon"
           onClick={isPaused ? toggleStart : () => {}}
         >
-          {isPaused ? "STOP" : isStarted && totalTimerLeft}
+          {isStarted && isPaused ? "STOP" : totalTimerLeft}
         </Text>
       </Flex>
       <Text fontSize="1.5em" color="text.salmon" textAlign="center" mt="1em">

@@ -8,28 +8,20 @@ const TICK_PERIOD = 100;
 
 export const useProgressionUtil = () => {
     const {setting} = useSelector((state: rootStateType) => state);
-    const {runningStepInfo} = setting;
 
-    const {state, initializeSteps,initializeTimer,resetSteps,nextStep,togglePause,toggleStart,tick,dispatch} = useProgressionReducer()
+    const {state, initializeSteps,resetSteps,nextStep,togglePause,toggleStart,tick,dispatch} = useProgressionReducer()
     const {steps,currentStep, timerLeft, totalTimerLeft, timer, totalTimer, isStarted, isPaused} = state;
 
     useEffect(() => {
-        initializeSteps()
-        // if (!steps[0]) {
-        //     setTimeout(() => {
-        //         initializeSteps()
-        //     }, 1000)
-        //     return;
-        // }
-        initializeTimer()
-        setTimeout(()=> {
-            dispatch({type: "TICK"})
-        },1000)
-    }, [steps])
-    console.log(isStarted)
+        if(!currentStep) {
+            setTimeout(() => {
+                initializeSteps()
+            },500)
+        }
+    }, [state])
+    
     // useEffect for timer
     useEffect(() => {
-        console.log(timerLeft, totalTimerLeft, currentStep)
         if (!isStarted || isPaused) {
             return;
         }
@@ -48,9 +40,7 @@ export const useProgressionUtil = () => {
         if (totalTimerLeft > 0) {
             nextStep();
         }
-
-        
-    }, [state, isStarted, isPaused, timerLeft, totalTimerLeft, currentStep])
+    }, [state])
 
     const currentTotalTimerPercent = (totalTimerLeft / totalTimer) * 100;
     const currentTimerPercent = (timerLeft / timer) * 100;

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { rootStateType } from "./redux/store";
 
 export type ProgresssionStateType = {
+    baseSteps: RunningStepType[],
     isStarted: boolean,
     isPaused: boolean,
     currentStep: RunningStepType | undefined,
@@ -21,20 +22,23 @@ export const useProgressionReducer = () => {
     const setting = useSelector((state: rootStateType) => state.setting);
 
 
-    const reducer = (s: ProgresssionStateType, action: any) => {
-        console.log(action.type,"CALLED",s.isStarted)
+    const reducer = (prevState: ProgresssionStateType, action: any) => {
+        let s = {...prevState}
+        
 
         switch (action.type) {
             case "INITIALIZE_STEPS":
                 if (setting.runningSequenceID) {
-                    s.steps = setting.runningSequenceList[setting.runningSequenceID].steps;
+                    s.steps = [...setting.runningSequenceList[setting.runningSequenceID].steps];
                 } else {
-                    s.steps = setting.runningSequenceList[0].steps;
+                    s.steps = [...setting.runningSequenceList[0].steps];
                 }
-                return s
-            case "INITIALIZE_TIMER" :
+
+                s.baseSteps = [...s.steps];
+                
                 let cntTime = 0;
                 for (let i = 0; i < s.steps.length; i++) {
+                    
                     cntTime += s.steps[i].duration * s.steps[i].reps;
                 }
                 s.totalTimer = cntTime;
@@ -43,51 +47,52 @@ export const useProgressionReducer = () => {
                 s.currentStep = s.steps[0];
                 s.currentIndex = 0;
                 s.timer = s.steps[0].duration;
-                
-                return s
+                s.timerLeft = s.steps[0].duration;
+                break
             case "RESET_STEPS":
-                s.steps = setting.runningSequenceList[0].steps;
-                s.currentStep = setting.runningSequenceList[0].steps[0];
-                s.timer = setting.runningSequenceList[0].steps[0].duration;
-                return s
+                s.steps = [...s.baseSteps]
+                s.currentStep = s.steps[0];
+                s.timer = s.steps[0].duration;
+                break
             case "NEXT_STEP":
                 if (!s.currentStep) {
-                    return s;
+                    break
                 }
         
                 if (s.currentStep.reps > 0) {
                     s.currentStep.reps -= 1
                     s.timer = s.currentStep.duration;
-                    return s;
+                    break
                 }
         
                 if (s.currentIndex + 1 >= s.steps.length) {
                     s.isStarted;
-                    return s;
+                    break
                 }
         
                 s.currentIndex += 1;
                 s.currentStep = s.steps[s.currentIndex];
-                s.timer = s.steps[s.currentIndex].duration;     
+                s.timer = s.steps[s.currentIndex].duration;  
+                break   
             case "PREV_STEP":
                 if (s.currentIndex - 1 < 0) {
-                    return s;
+                    break
                 }
             
                 s.currentIndex -= 1;
                 s.currentStep = s.steps[s.currentIndex];
                 s.timer = s.steps[s.currentIndex].duration;
-                return s;
+                break
             case "TOGGLE_START":
-                s.steps = setting.runningSequenceList[0].steps;
-                s.currentStep = setting.runningSequenceList[0].steps[0];
-                s.timer = setting.runningSequenceList[0].steps[0].duration;
+                s.steps = s.baseSteps
+                s.currentStep = s.steps[0];
+                s.timer = s.steps[0].duration;
                 s.isStarted = !s.isStarted;
                 s.isPaused = false;
-                return s;
+                break
             case "TOGGLE_PAUSE":
                 s.isPaused = !s.isPaused;
-                return s;
+                break
             case "RECOUNT_TOTAL_TIMER":
                 let cntTime2 = 0;
                 for (let i = 0; i < s.steps.length; i++) {
@@ -95,18 +100,21 @@ export const useProgressionReducer = () => {
                 }
                 s.totalTimer = cntTime2;
                 s.totalTimerLeft = cntTime2;
-                return s;
+                break
             case "TICK":
                 s.timerLeft -= action.payload.tickPeriod/1000;
                 s.totalTimerLeft -= action.payload.tickPeriod/1000;
-                return s;
+                break
                 
 
         }
+        console.log(s)
+        console.log(action)
         return s
     }
 
     const [state, dispatch] = useReducer(reducer, {
+        baseSteps: [],
         isStarted: false,
         isPaused: true,
         currentStep: undefined,
@@ -127,7 +135,7 @@ export const useProgressionReducer = () => {
         prevStep: () => dispatch({type: "PREV_STEP"}),
         resetSteps: ()  => dispatch({type: "RESET_STEPS"}),
         recountTotalTimer: () => dispatch({type: "RECOUNT_TOTAL_TIMER"}),
-        tick: (tickPeriod: number) => dispatch({type: "TICK", payload: tickPeriod}),
+        tick: (tickPeriod: number) => dispatch({type: "TICK", payload: {tickPeriod}}),
         dispatch
     }
 }
