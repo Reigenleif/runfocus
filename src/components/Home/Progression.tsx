@@ -1,5 +1,6 @@
 import { Box, CircularProgress, Flex, Text } from "@chakra-ui/react";
 import { useProgressionUtil } from "../../util/use-progression-util";
+import { secToFormat } from "../../util/sec-to-format";
 
 export const Progression = () => {
   const {
@@ -65,7 +66,7 @@ export const Progression = () => {
           color="text.salmon"
           onClick={isPaused ? toggleStart : () => {}}
         >
-          {isStarted && isPaused ? "STOP" : totalTimerLeft}
+          {isStarted && (isPaused ? "STOP" : `Time Left: ${secToFormat(totalTimerLeft)}`)}
         </Text>
       </Flex>
       <Text fontSize="1.5em" color="text.salmon" textAlign="center" mt="1em">

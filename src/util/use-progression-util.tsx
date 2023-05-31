@@ -9,7 +9,7 @@ const TICK_PERIOD = 100;
 export const useProgressionUtil = () => {
     const {setting} = useSelector((state: rootStateType) => state);
 
-    const {state, initializeSteps,resetSteps,nextStep,togglePause,toggleStart,tick,dispatch} = useProgressionReducer()
+    const {state, initializeSteps,resetSteps,nextStep,togglePause,toggleStart,tick,recountTotalTimer} = useProgressionReducer()
     const {steps,currentStep, timerLeft, totalTimerLeft, timer, totalTimer, isStarted, isPaused} = state;
 
     useEffect(() => {
@@ -34,11 +34,12 @@ export const useProgressionUtil = () => {
             setTimeout(() => {
                 tick(TICK_PERIOD)
             }, TICK_PERIOD);
-        return;
+            return;
         }
 
         if (totalTimerLeft > 0) {
             nextStep();
+            recountTotalTimer();
         }
     }, [state])
 
@@ -49,7 +50,7 @@ export const useProgressionUtil = () => {
         currentStep,
         currentTimerLeft: timerLeft.toFixed(0),
         currentTotalTimerPercent,
-        totalTimerLeft: totalTimerLeft.toFixed(0),
+        totalTimerLeft,
         currentTimerPercent,
         isStarted,
         isPaused,

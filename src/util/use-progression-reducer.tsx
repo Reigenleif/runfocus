@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { rootStateType } from "./redux/store";
 
 export type ProgresssionStateType = {
-    baseSteps: RunningStepType[],
     isStarted: boolean,
     isPaused: boolean,
     currentStep: RunningStepType | undefined,
@@ -29,30 +28,28 @@ export const useProgressionReducer = () => {
         switch (action.type) {
             case "INITIALIZE_STEPS":
                 if (setting.runningSequenceID) {
-                    s.steps = [...setting.runningSequenceList[setting.runningSequenceID].steps];
+                    s.steps = setting.runningSequenceList[setting.runningSequenceID].steps
                 } else {
-                    s.steps = [...setting.runningSequenceList[0].steps];
+                    s.steps = setting.runningSequenceList[0].steps
                 }
-
-                s.baseSteps = [...s.steps];
                 
                 let cntTime = 0;
                 for (let i = 0; i < s.steps.length; i++) {
-                    
                     cntTime += s.steps[i].duration * s.steps[i].reps;
                 }
                 s.totalTimer = cntTime;
                 s.totalTimerLeft = cntTime;
 
-                s.currentStep = s.steps[0];
+                s.currentStep = {...s.steps[0]}
                 s.currentIndex = 0;
                 s.timer = s.steps[0].duration;
                 s.timerLeft = s.steps[0].duration;
                 break
             case "RESET_STEPS":
-                s.steps = [...s.baseSteps]
-                s.currentStep = s.steps[0];
+                
+                s.currentStep = {...s.steps[0]}
                 s.timer = s.steps[0].duration;
+                s.timerLeft = s.steps[0].duration;
                 break
             case "NEXT_STEP":
                 if (!s.currentStep) {
@@ -62,17 +59,20 @@ export const useProgressionReducer = () => {
                 if (s.currentStep.reps > 0) {
                     s.currentStep.reps -= 1
                     s.timer = s.currentStep.duration;
+                    s.timerLeft = s.currentStep.duration;
                     break
                 }
         
                 if (s.currentIndex + 1 >= s.steps.length) {
-                    s.isStarted;
+                    s.isStarted = false;
+                    s.isPaused = true;
                     break
                 }
         
                 s.currentIndex += 1;
-                s.currentStep = s.steps[s.currentIndex];
-                s.timer = s.steps[s.currentIndex].duration;  
+                s.currentStep = {...s.steps[s.currentIndex]};
+                s.timer = s.currentStep.duration;  
+                s.timerLeft = s.currentStep.duration;
                 break   
             case "PREV_STEP":
                 if (s.currentIndex - 1 < 0) {
@@ -80,13 +80,14 @@ export const useProgressionReducer = () => {
                 }
             
                 s.currentIndex -= 1;
-                s.currentStep = s.steps[s.currentIndex];
-                s.timer = s.steps[s.currentIndex].duration;
+                s.currentStep = {...s.steps[s.currentIndex]};
+                s.timer = s.currentStep.duration; 
+                s.timerLeft = s.currentStep.duration;
                 break
             case "TOGGLE_START":
-                s.steps = s.baseSteps
-                s.currentStep = s.steps[0];
+                s.currentStep = {...s.steps[s.currentIndex]};
                 s.timer = s.steps[0].duration;
+                s.timerLeft = s.currentStep.duration;
                 s.isStarted = !s.isStarted;
                 s.isPaused = false;
                 break
@@ -95,18 +96,19 @@ export const useProgressionReducer = () => {
                 break
             case "RECOUNT_TOTAL_TIMER":
                 let cntTime2 = 0;
-                for (let i = 0; i < s.steps.length; i++) {
+                if (s.currentStep) {
+                    cntTime2 += s.currentStep.duration * s.currentStep.reps;
+                }
+
+                for (let i = s.currentIndex + 1; i < s.steps.length; i++) {
                     cntTime2 += s.steps[i].duration * s.steps[i].reps;
                 }
-                s.totalTimer = cntTime2;
                 s.totalTimerLeft = cntTime2;
                 break
             case "TICK":
                 s.timerLeft -= action.payload.tickPeriod/1000;
                 s.totalTimerLeft -= action.payload.tickPeriod/1000;
                 break
-                
-
         }
         console.log(s)
         console.log(action)
@@ -114,7 +116,6 @@ export const useProgressionReducer = () => {
     }
 
     const [state, dispatch] = useReducer(reducer, {
-        baseSteps: [],
         isStarted: false,
         isPaused: true,
         currentStep: undefined,
