@@ -10,7 +10,7 @@ export const useProgressionUtil = () => {
     const {setting} = useSelector((state: rootStateType) => state);
 
     const {state, initializeSteps,resetSteps,nextStep,togglePause,toggleStart,tick,recountTotalTimer} = useProgressionReducer()
-    const {steps,currentStep, timerLeft, totalTimerLeft, timer, totalTimer, isStarted, isPaused} = state;
+    const {steps,currentStep, timerLeft, totalTimerLeft, timer, totalTimer, isStarted, isPaused,runningSequence} = state;
 
     useEffect(() => {
         if(!currentStep) {
@@ -54,6 +54,7 @@ export const useProgressionUtil = () => {
         currentTimerPercent,
         isStarted,
         isPaused,
+        runningSequence,
         toggleStart,
         togglePause,
     }

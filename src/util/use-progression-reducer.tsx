@@ -1,9 +1,10 @@
 import { useReducer } from "react";
-import { RunningStepType } from "./redux/settingSlice";
+import { RunningSequence, RunningStepType } from "./redux/settingSlice";
 import { useSelector } from "react-redux";
 import { rootStateType } from "./redux/store";
 
 export type ProgresssionStateType = {
+    runningSequence: RunningSequence,
     isStarted: boolean,
     isPaused: boolean,
     currentStep: RunningStepType | undefined,
@@ -28,10 +29,12 @@ export const useProgressionReducer = () => {
         switch (action.type) {
             case "INITIALIZE_STEPS":
                 if (setting.runningSequenceID) {
-                    s.steps = setting.runningSequenceList[setting.runningSequenceID].steps
+                    s.runningSequence = setting.runningSequenceList[setting.runningSequenceID]
                 } else {
-                    s.steps = setting.runningSequenceList[0].steps
+                    s.runningSequence = setting.runningSequenceList[0]
                 }
+
+                s.steps = s.runningSequence.steps
                 
                 let cntTime = 0;
                 for (let i = 0; i < s.steps.length; i++) {
@@ -116,6 +119,7 @@ export const useProgressionReducer = () => {
     }
 
     const [state, dispatch] = useReducer(reducer, {
+        runningSequence: {name: "", id: 0, steps: []},
         isStarted: false,
         isPaused: true,
         currentStep: undefined,
@@ -137,6 +141,5 @@ export const useProgressionReducer = () => {
         resetSteps: ()  => dispatch({type: "RESET_STEPS"}),
         recountTotalTimer: () => dispatch({type: "RECOUNT_TOTAL_TIMER"}),
         tick: (tickPeriod: number) => dispatch({type: "TICK", payload: {tickPeriod}}),
-        dispatch
     }
 }

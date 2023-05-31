@@ -8,7 +8,7 @@ interface layoutProps {
 
 const Layout = ({ children }: layoutProps) => {
   return (
-    <Box fontFamily="'Arimo', sans-serif" fontWeight="bold" maxHeight="100vh" overflow="hidden">
+    <Box fontFamily="'Arimo', sans-serif" fontWeight="bold" maxHeight="100vh">
       <Navbar />
       {children}
       <Footer/>

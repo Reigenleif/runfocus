@@ -1,9 +1,11 @@
 import { Box, CircularProgress, Flex, Text } from "@chakra-ui/react";
 import { useProgressionUtil } from "../../util/use-progression-util";
 import { secToFormat } from "../../util/sec-to-format";
+import { RunningInfoBox } from "./RunningInfoBox";
 
 export const Progression = () => {
   const {
+    runningSequence,
     currentStep,
     currentTimerLeft,
     currentTimerPercent,
@@ -17,7 +19,8 @@ export const Progression = () => {
 
   return (
     <Flex w="100%" h="35em" flexDir="column" alignItems="center">
-      <Flex w="20em" h="20em" justifyContent="center">
+      <RunningInfoBox sequence={runningSequence} currentStep={currentStep} />
+      <Flex w="20em" h="20em" justifyContent="center" mt="1em">
         <Box
           w="20em"
           h="20em"
@@ -66,7 +69,8 @@ export const Progression = () => {
           color="text.salmon"
           onClick={isPaused ? toggleStart : () => {}}
         >
-          {isStarted && (isPaused ? "STOP" : `Time Left: ${secToFormat(totalTimerLeft)}`)}
+          {isStarted &&
+            (isPaused ? "STOP" : `Time Left: ${secToFormat(totalTimerLeft)}`)}
         </Text>
       </Flex>
       <Text fontSize="1.5em" color="text.salmon" textAlign="center" mt="1em">

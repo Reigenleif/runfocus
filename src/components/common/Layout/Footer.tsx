@@ -18,7 +18,7 @@ export const Footer = () => {
     const isSettings = window.location.pathname === "/settings"
   return (
     <Flex
-      w="100vw"
+      w="100%"
       h="4em"
       justifyContent="space-evenly"
       alignItems="center"

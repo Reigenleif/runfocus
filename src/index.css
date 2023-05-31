@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&display=swap');
 
+:root {
+  overflow: hidden;
+}
+
 body {
   font-family: 'Arimo', sans-serif;
   line-height: 24px;
