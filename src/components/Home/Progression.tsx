@@ -2,6 +2,7 @@ import { Box, CircularProgress, Flex, Text } from "@chakra-ui/react";
 import { useProgressionUtil } from "../../util/use-progression-util";
 import { secToFormat } from "../../util/sec-to-format";
 import { RunningInfoBox } from "./RunningInfoBox";
+import { Map } from "./Map";
 
 export const Progression = () => {
   const {
@@ -18,7 +19,7 @@ export const Progression = () => {
   } = useProgressionUtil();
 
   return (
-    <Flex w="100%" h="35em" flexDir="column" alignItems="center">
+    <Flex w="100%" flexDir="column" alignItems="center">
       <RunningInfoBox sequence={runningSequence} currentStep={currentStep} />
       <Flex w="20em" h="20em" justifyContent="center" mt="1em">
         <Box
@@ -73,12 +74,28 @@ export const Progression = () => {
             (isPaused ? "STOP" : `Time Left: ${secToFormat(totalTimerLeft)}`)}
         </Text>
       </Flex>
-      <Text fontSize="1.5em" color="text.salmon" textAlign="center" mt="1em">
-        You Have not ran today
-      </Text>
-      <Text fontSize="1.5em" color="text.violet" textAlign="center" mt="1em">
-        Total length ran : 0.0km
-      </Text>
+      {isStarted ? (
+        <Map />
+      ) : (
+        <>
+          <Text
+            fontSize="1.5em"
+            color="text.salmon"
+            textAlign="center"
+            mt="1em"
+          >
+            You Have not ran today
+          </Text>
+          <Text
+            fontSize="1.5em"
+            color="text.violet"
+            textAlign="center"
+            mt="1em"
+          >
+            Total length ran : 0.0km
+          </Text>
+        </>
+      )}
     </Flex>
   );
 };

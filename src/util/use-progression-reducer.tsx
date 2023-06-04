@@ -113,8 +113,8 @@ export const useProgressionReducer = () => {
                 s.totalTimerLeft -= action.payload.tickPeriod/1000;
                 break
         }
-        console.log(s)
-        console.log(action)
+        // console.log(s)
+        // console.log(action)
         return s
     }
 

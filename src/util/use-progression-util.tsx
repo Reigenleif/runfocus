@@ -48,7 +48,7 @@ export const useProgressionUtil = () => {
 
     return {
         currentStep,
-        currentTimerLeft: timerLeft.toFixed(0),
+        currentTimerLeft: Math.floor(timerLeft),
         currentTotalTimerPercent,
         totalTimerLeft,
         currentTimerPercent,
